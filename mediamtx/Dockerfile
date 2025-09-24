@@ -7,7 +7,8 @@ FROM bluenviron/mediamtx:latest
 ENV MTX_WEBRTC_ENCRYPTION=optional \
     MTX_WEBRTC_ALLOWORIGIN=https://prekestudio.itagenten.no \
     MTX_PATHS_ALL_SOURCE=publisher \
-    MTX_WEBRTC_ICESERVERS=["stun:stun.l.google.com:19302","stun:stun.cloudflare.com:3478"]
+    MTX_WEBRTC_ICESERVERS=["stun:stun.l.google.com:19302","stun:stun.cloudflare.com:3478"] \
+    MTX_WEBRTC_ADDITIONALHEADERS={"Access-Control-Allow-Headers":"content-type"}
 
 # Allow extra headers for WHIP/WHEP if a preflight complains
 # ENV MTX_WEBRTC_ADDITIONALHEADERS={"Access-Control-Allow-Headers":"content-type"}

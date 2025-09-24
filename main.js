@@ -5724,7 +5724,14 @@ async function main() {
 			}
 		}
 		if (!session.whipoutSettings){
-			session.whipoutSettings = { type: "whep", url: "https://"+session.mediamtx+"/"+session.streamID+"/whep" };
+			let whepBase = session.mediamtx || "";
+			if (!(whepBase.startsWith("http://") || whepBase.startsWith("https://"))){
+				whepBase = "https://" + whepBase;
+			}
+			if (whepBase.endsWith("/")) {
+				whepBase = whepBase.slice(0, -1);
+			}
+			session.whipoutSettings = { type: "whep", url: whepBase+"/"+session.streamID+"/whep" };
 			console.log("WHIP OUT: "+session.whipOutput+", WHEP SHARE: "+session.whipoutSettings.url);
 		}
 		if (session.stereo === false){ 
