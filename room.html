@@ -2771,7 +2771,15 @@
 				const url = new URL(window.location.href);
 				const params = url.searchParams;
 				const mtxParam = params.get('mediamtx');
-				if (mtxParam) { input.value = mtxParam; }
+				if (mtxParam) {
+					input.value = mtxParam;
+					const normalized = normalizeMtx(mtxParam);
+					if (normalized && normalized !== mtxParam) {
+						params.set('mediamtx', normalized);
+						window.location.replace(url.toString());
+						return;
+					}
+				}
 				function getResolvedMtx(){
 					return (window.session && window.session.mediamtx) ? window.session.mediamtx : (mtxParam || 'Not set');
 				}
