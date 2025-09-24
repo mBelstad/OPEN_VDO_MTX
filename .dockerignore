@@ -1,0 +1,26 @@
+# OS / editor
+.DS_Store
+.vscode
+.idea
+
+# VCS
+.git
+.gitignore
+.github
+
+# Logs / maps
+*.log
+*.map
+
+# Not needed at runtime
+examples/
+CONTRIBUTING.md
+README.md
+AGPLv3.md
+LICENCE.md
+rawdoc.md
+install.md
+turnserver_install.sh.sample
+turnserver_basic.conf
+turnserver.md
+turn-credentials-php.sample
