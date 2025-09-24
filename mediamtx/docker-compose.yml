@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: mediamtx
+    environment:
+      - MTX_WEBRTC_ENCRYPTION=optional
+      - MTX_WEBRTC_ALLOWORIGIN=${MTX_WEBRTC_ALLOWORIGIN:-https://prekestudio.itagenten.no}
+      - MTX_WEBRTC_ICESERVERS=${MTX_WEBRTC_ICESERVERS:-["stun:stun.l.google.com:19302","stun:stun.cloudflare.com:3478"]}
+      - MTX_WEBRTC_ADDITIONALHEADERS=${MTX_WEBRTC_ADDITIONALHEADERS:-{"Access-Control-Allow-Headers":"content-type"}}
+      # Uncomment and adjust if you need to pin UDP port range for WebRTC
+      # - MTX_WEBRTC_UDP_PORTS=${MTX_WEBRTC_UDP_PORTS:-8000-8099}
+      # - MTX_WEBRTC_EXTERNALIPS=${MTX_WEBRTC_EXTERNALIPS:-}
+    ports:
+      - "8889:8889" # internal only when behind Traefik/Coolify
+      # Expose UDP range only if not behind Traefik/Cloudflare Tunnel and needed
+      # - "8000-8099:8000-8099/udp"
+    restart: unless-stopped
+
+

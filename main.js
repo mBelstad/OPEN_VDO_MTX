@@ -5698,36 +5698,34 @@ async function main() {
 	} 
 	
 	if (session.mediamtx){
-		if (!session.mediamtx.includes(".") && !session.mediamtx.includes("localhost")){
-			session.mediamtx += ".com";
+		// Build a proper base URL from the provided mediamtx value without forcing a port,
+		// except when targeting localhost where the default MediaMTX port is 8889.
+		let mediamtxBase = session.mediamtx;
+		if (!mediamtxBase.includes(".") && !mediamtxBase.includes("localhost") && !mediamtxBase.includes("127.0.0.1")){
+			mediamtxBase += ".com";
 		}
-		if (!session.mediamtx.includes(":")){
-			session.mediamtx += ":8889";
-		}
-		if (!session.whipOutput){
-			if (!(session.mediamtx.startsWith("https://") || session.mediamtx.startsWith("http://"))){
-				if (session.mediamtx.startsWith("localhost:")){
-					session.whipOutput = "http://"+session.mediamtx+"/"+session.streamID+"/whip";
-					
-					if (!session.whipoutSettings){
-						session.whipoutSettings = { type: "whep", url: "http://"+session.mediamtx+"/"+session.streamID+"/whep" };
-						console.log("WHIP OUT: "+session.whipOutput+", WHEP SHARE: "+session.whipoutSettings.url);
-					}
-					
-				} else {
-					session.whipOutput = "https://"+session.mediamtx+"/"+session.streamID+"/whip";
+		if (!(mediamtxBase.startsWith("http://") || mediamtxBase.startsWith("https://"))){
+			if (mediamtxBase.startsWith("localhost") || mediamtxBase.startsWith("127.0.0.1")){
+				// Default to local dev port
+				if (!mediamtxBase.includes(":")){
+					mediamtxBase += ":8889";
 				}
-			} else if (session.mediamtx.endsWith("/")){
-				session.whipOutput = session.mediamtx+session.streamID+"/whip";
+				mediamtxBase = "http://" + mediamtxBase;
 			} else {
-				session.whipOutput = session.mediamtx+"/"+session.streamID+"/whip";
+				// Assume HTTPS when a domain is provided (Coolify + Traefik + Cloudflare)
+				mediamtxBase = "https://" + mediamtxBase;
+			}
+		}
+
+		if (!session.whipOutput){
+			if (mediamtxBase.endsWith("/")){
+				session.whipOutput = mediamtxBase + session.streamID + "/whip";
+			} else {
+				session.whipOutput = mediamtxBase + "/" + session.streamID + "/whip";
 			}
 		}
 		if (!session.whipoutSettings){
-			let whepBase = session.mediamtx || "";
-			if (!(whepBase.startsWith("http://") || whepBase.startsWith("https://"))){
-				whepBase = "https://" + whepBase;
-			}
+			let whepBase = mediamtxBase;
 			if (whepBase.endsWith("/")) {
 				whepBase = whepBase.slice(0, -1);
 			}
