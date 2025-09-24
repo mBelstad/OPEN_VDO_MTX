@@ -2672,5 +2672,64 @@
 		<script type="text/javascript" id="main-js" src="./main.js" data-translation="blank"></script>
 		-->
 		<script type="text/javascript" crossorigin="anonymous" id="main-js" src="./main.js?ver=767"></script>
+
+		<!-- WSS helper panel -->
+		<div id="wss-helper" style="position:fixed;bottom:10px;right:10px;z-index:9999;background:#111;color:#fff;border:1px solid #333;border-radius:8px;padding:10px 12px;font:12px/1.4 sans-serif;box-shadow:0 2px 10px rgba(0,0,0,0.4);">
+			<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+				<strong>Signaling (WSS)</strong>
+				<button id="wss-hide" style="background:#222;color:#ddd;border:1px solid #444;border-radius:4px;padding:2px 6px;cursor:pointer;">Hide</button>
+			</div>
+			<div id="wss-status" style="margin-top:6px;opacity:0.9;"></div>
+			<div style="margin-top:6px;display:flex;gap:6px;">
+				<input id="wss-input" type="text" style="flex:1 1 auto;min-width:220px;background:#1a1a1a;color:#ddd;border:1px solid #444;border-radius:4px;padding:4px 6px;" placeholder="wss://wss.vdo.ninja:443" />
+				<button id="wss-apply" style="background:#2a6bff;color:#fff;border:0;border-radius:4px;padding:4px 8px;cursor:pointer;">Apply</button>
+				<button id="wss-clear" style="background:#444;color:#fff;border:0;border-radius:4px;padding:4px 8px;cursor:pointer;">Clear</button>
+			</div>
+		</div>
+		<div id="wss-show" style="position:fixed;bottom:10px;right:10px;z-index:9998;background:#111;color:#fff;border:1px solid #333;border-radius:8px;padding:6px 8px;font:12px/1.4 sans-serif;display:none;cursor:pointer;">Show WSS</div>
+		<script>
+		(function(){
+			try {
+				const panel = document.getElementById('wss-helper');
+				const showBtn = document.getElementById('wss-show');
+				const status = document.getElementById('wss-status');
+				const input = document.getElementById('wss-input');
+				const applyBtn = document.getElementById('wss-apply');
+				const clearBtn = document.getElementById('wss-clear');
+				const hideBtn = document.getElementById('wss-hide');
+				const url = new URL(window.location.href);
+				const params = url.searchParams;
+				const wssParam = params.get('wss') || params.get('wss2');
+				if (wssParam) { input.value = wssParam; }
+				function resolvedText() {
+					const s = (window.session && window.session.wss) ? window.session.wss : 'Default (auto)';
+					return 'Resolved: ' + s + (wssParam ? ' (override in URL)' : '');
+				}
+				status.textContent = resolvedText();
+				applyBtn.onclick = function(){
+					let val = (input.value || '').trim();
+					if (!val) return;
+					if (!val.startsWith('wss://') && !val.startsWith('ws://')) { val = 'wss://' + val; }
+					params.set('wss', val);
+					params.delete('wss2');
+					params.delete('audience');
+					window.location.href = url.toString();
+				};
+				clearBtn.onclick = function(){
+					params.delete('wss'); params.delete('wss2'); params.delete('audience');
+					window.location.href = url.toString();
+				};
+				hideBtn.onclick = function(){
+					panel.style.display = 'none';
+					showBtn.style.display = 'block';
+				};
+				showBtn.onclick = function(){
+					panel.style.display = 'block';
+					showBtn.style.display = 'none';
+				};
+				window.addEventListener('load', function(){ status.textContent = resolvedText(); });
+			} catch(e) {}
+		})();
+		</script>
 	</body>
 </html>
