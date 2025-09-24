@@ -2775,6 +2775,14 @@
 				function getResolvedMtx(){
 					return (window.session && window.session.mediamtx) ? window.session.mediamtx : (mtxParam || 'Not set');
 				}
+				function normalizeMtx(v){
+					v = (v || '').trim();
+					if (!v) return v;
+					if (!v.startsWith('http://') && !v.startsWith('https://')) {
+						v = 'https://' + v; // ensures no :8889 is auto-added by the app logic
+					}
+					return v;
+				}
 				function getWhep(){
 					if (window.session && window.session.whipoutSettings && window.session.whipoutSettings.url) return window.session.whipoutSettings.url;
 					if (window.session && window.session.mediamtx && window.session.streamID) {
@@ -2792,15 +2800,16 @@
 				}
 				publishBtn.onclick = function(){
 					if (!params.has('push')) { params.set('push',''); }
-					if (!params.get('mediamtx')) {
-						let v = (input.value||'').trim();
+					let v = params.get('mediamtx');
+					if (!v) {
+						v = normalizeMtx(input.value);
 						if (!v) { alert('Set MediaMTX host first.'); return; }
 						params.set('mediamtx', v);
 					}
 					window.location.href = url.toString();
 				};
 				applyBtn.onclick = function(){
-					let val = (input.value || '').trim();
+					let val = normalizeMtx(input.value);
 					if (!val) return;
 					params.set('mediamtx', val);
 					window.location.href = url.toString();
