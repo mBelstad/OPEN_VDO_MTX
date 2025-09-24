@@ -3190,9 +3190,11 @@
 				<button id="mtx-apply" style="background:#2a6bff;color:#fff;border:0;border-radius:4px;padding:4px 8px;cursor:pointer;">Apply</button>
 				<button id="mtx-clear" style="background:#444;color:#fff;border:0;border-radius:4px;padding:4px 8px;cursor:pointer;">Clear</button>
 			</div>
-			<div style="margin-top:6px;display:flex;gap:6px;align-items:center;">
-				<button id="mtx-copy-whep" style="background:#2a6bff;color:#fff;border:0;border-radius:4px;padding:4px 8px;cursor:pointer;">Copy WHEP</button>
-				<small style="opacity:0.8">Requires an active publish (&push)</small>
+			<div style="margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+				<button id="mtx-publish" style="background:#18a05e;color:#fff;border:0;border-radius:4px;padding:4px 8px;cursor:pointer;">Publish to MediaMTX</button>
+				<button id="mtx-copy-whep" style="background:#2a6bff;color:#fff;border:0;border-radius:4px;padding:4px 8px;cursor:pointer;">Copy Viewer (WHEP)</button>
+				<button id="mtx-copy-view-url" style="background:#444;color:#fff;border:0;border-radius:4px;padding:4px 8px;cursor:pointer;">Copy Viewer URL</button>
+				<small style="opacity:0.8">Publishing needs &push; viewer uses ?whepplay=</small>
 			</div>
 			<div style="margin-top:6px;opacity:0.75">
 				<small>Tip: Behind Cloudflare, use 443/8443 or set DNS-only for custom ports.</small>
@@ -3209,6 +3211,8 @@
 				const applyBtn = document.getElementById('mtx-apply');
 				const clearBtn = document.getElementById('mtx-clear');
 				const copyWhepBtn = document.getElementById('mtx-copy-whep');
+				const copyViewerUrlBtn = document.getElementById('mtx-copy-view-url');
+				const publishBtn = document.getElementById('mtx-publish');
 				const hideBtn = document.getElementById('mtx-hide');
 				const url = new URL(window.location.href);
 				const params = url.searchParams;
@@ -3232,6 +3236,16 @@
 					const whep = getWhep();
 					status.textContent = 'Resolved: ' + getResolvedMtx() + (whep ? ' | WHEP: ' + whep : '');
 				}
+				publishBtn.onclick = function(){
+					// Minimal helper: ensure &push is present and mediamtx set; then the normal publish flow button on the page can be used
+					if (!params.has('push')) { params.set('push',''); }
+					if (!params.get('mediamtx')) {
+						let v = (input.value||'').trim();
+						if (!v) { alert('Set MediaMTX host first.'); return; }
+						params.set('mediamtx', v);
+					}
+					window.location.href = url.toString();
+				};
 				applyBtn.onclick = function(){
 					let val = (input.value || '').trim();
 					if (!val) return;
@@ -3245,7 +3259,14 @@
 				copyWhepBtn.onclick = async function(){
 					const whep = getWhep();
 					if (!whep) return;
-					try { await navigator.clipboard.writeText(whep); copyWhepBtn.textContent = 'Copied!'; setTimeout(()=>copyWhepBtn.textContent='Copy WHEP',1200); } catch(e){}
+					try { await navigator.clipboard.writeText(whep); copyWhepBtn.textContent = 'Copied!'; setTimeout(()=>copyWhepBtn.textContent='Copy Viewer (WHEP)',1200); } catch(e){}
+				};
+				copyViewerUrlBtn.onclick = async function(){
+					const whep = getWhep();
+					if (!whep) return;
+					const viewer = new URL(window.location.origin + window.location.pathname);
+					viewer.searchParams.set('whepplay', whep);
+					try { await navigator.clipboard.writeText(viewer.toString()); copyViewerUrlBtn.textContent = 'Copied!'; setTimeout(()=>copyViewerUrlBtn.textContent='Copy Viewer URL',1200); } catch(e){}
 				};
 				hideBtn.onclick = function(){ panel.style.display='none'; showBtn.style.display='block'; };
 				showBtn.onclick = function(){ panel.style.display='block'; showBtn.style.display='none'; };
