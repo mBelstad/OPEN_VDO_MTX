@@ -6,7 +6,7 @@ FROM bluenviron/mediamtx:latest
 # Termination at reverse proxy (Cloudflare->Traefik) means HTTPS at edge, HTTP inside
 ENV MTX_WEBRTC_ENCRYPTION=optional \
     MTX_WEBRTC_ALLOWORIGIN=https://prekestudio.itagenten.no \
-    MTX_PATHS_ALL_SOURCE=publisher \
+    MTX_PATHS_ALL_OTHERS_SOURCE=publisher \
     MTX_WEBRTC_ICESERVERS=["stun:stun.l.google.com:19302","stun:stun.cloudflare.com:3478"] \
     MTX_WEBRTC_ADDITIONALHEADERS={"Access-Control-Allow-Headers":"content-type"}
 
