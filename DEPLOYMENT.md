@@ -35,18 +35,19 @@ By default, the UI can use public VDO.Ninja infrastructure (various `*.vdo.ninja
 These are optional. You can start with only the static UI on your domain and iterate later.
 
 ### 6) MediaMTX + Cloudflare notes
-- WHIP/WHEP are HTTPS endpoints. If your MediaMTX sits behind Cloudflare:
-  - Prefer port 443 (or 8443) and a valid cert so Cloudflare can proxy.
-  - Non-standard ports may be blocked by Cloudflare unless you set the DNS record to DNS-only (gray cloud).
-  - Ensure CORS allows your UI origin and `Content-Type: application/sdp` for WHIP.
-  - Confirm OPTIONS responses are allowed if your setup requires it.
-- If testing via `&mediamtx=host:port`, start with `https://host` on 443 or use DNS-only for custom ports.
+- Recommended: Deploy MediaMTX as a separate Coolify app using this repo’s `mediamtx/` Dockerfile. Then set its domain to `sfu.itagenten.no` with Cloudflare proxy ON.
+- The Dockerfile sets:
+  - `MTX_WEBRTC_ENCRYPTION=optional` (TLS terminates at Coolify’s Traefik)
+  - `MTX_WEBRTC_ALLOWORIGIN=https://prekestudio.itagenten.no` (CORS)
+  - `MTX_PATHS_ALL_SOURCE=publisher`
+  - `MTX_WEBRTC_ICESERVERS=["stun:stun.l.google.com:19302","stun:stun.cloudflare.com:3478"]`
+- Optional: `MTX_WEBRTC_ADDITIONALHEADERS={"Access-Control-Allow-Headers":"content-type"}` if a preflight complains.
 
 ### 7) Quick MediaMTX test
-- Publish tab: `https://<your-ui>/?push&mediamtx=sfu.yourdomain:443`
-  - Open DevTools → Console → look for `WHIP OUT:` and `WHEP SHARE:` URLs.
+- Publish tab: `https://<your-ui>/?push&mediamtx=sfu.yourdomain` (no port if you’re on 443)
+  - DevTools console should show `WHIP OUT` and `WHEP SHARE` without network errors.
 - Viewer tab: `https://<your-ui>/?whepplay=` + encodeURIComponent(the WHEP URL)
-- Or use the helper panels (bottom-right) to set MediaMTX and copy WHEP.
+- Or use the helper panels (bottom-right) to set MediaMTX, publish, and copy a viewer link.
 
 ### 8) Nginx inside the container
 We serve files from `/usr/share/nginx/html` with sensible caching and security headers. If some advanced demos need SharedArrayBuffer (cross-origin isolation), you may need to selectively enable COOP/COEP headers. See `nginx.conf` notes.
@@ -55,7 +56,7 @@ We serve files from `/usr/share/nginx/html` with sensible caching and security h
 - 404s on wasm: ensure MIME `application/wasm` is served (added).
 - Cross-origin isolation errors: either disable strict COOP/COEP or add them only to routes that load SAB-enabled demos and make sure all subresources allow it.
 - WebSocket blocked: confirm Cloudflare WebSockets is ON and your Hetzner firewall allows 80/443.
-- WHIP/WHEP timeout: check Cloudflare port/proxy mode, DNS-only for custom ports, CORS, and valid TLS chain.
+- WHIP/WHEP timeout: check Cloudflare proxy mode and that MediaMTX is reachable at 443, CORS allows your UI origin, and TLS chain is valid.
 
 ### 10) Redeploy flow
 - Push to `main` (or your chosen branch). Coolify will auto-build and deploy.
