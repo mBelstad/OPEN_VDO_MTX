@@ -14,7 +14,18 @@ services:
       - "traefik.http.routers.sfu.rule=Host(`sfu.itagenten.no`)"
       - "traefik.http.routers.sfu.entrypoints=https"
       - "traefik.http.routers.sfu.tls=true"
+      - "traefik.http.routers.sfu.middlewares=sfu-cors"
       - "traefik.http.services.sfu.loadbalancer.server.port=8889"
+      - "traefik.http.middlewares.sfu-cors.headers.accesscontrolallowmethods=OPTIONS,POST,GET"
+      - "traefik.http.middlewares.sfu-cors.headers.accesscontrolalloworiginlist=https://prekestudio.itagenten.no"
+      - "traefik.http.middlewares.sfu-cors.headers.accesscontrolallowheaders=content-type,authorization"
+      - "traefik.http.middlewares.sfu-cors.headers.accesscontrolmaxage=86400"
+      - "traefik.http.middlewares.sfu-cors.headers.addvaryheader=true"
+      - "traefik.http.routers.sfu-preflight.rule=Host(`sfu.itagenten.no`) && (Method(`OPTIONS`) && (PathPrefix(`/whip/`) || PathPrefix(`/whep/`)))"
+      - "traefik.http.routers.sfu-preflight.entrypoints=https"
+      - "traefik.http.routers.sfu-preflight.tls=true"
+      - "traefik.http.routers.sfu-preflight.service=noop@internal"
+      - "traefik.http.routers.sfu-preflight.middlewares=sfu-cors"
     networks:
       - coolify
     ports:
