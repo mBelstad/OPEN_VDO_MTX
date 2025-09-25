@@ -26,7 +26,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
       - "traefik.http.routers.sfu.rule=Host(`sfu.itagenten.no`)"
-      - "traefik.http.routers.sfu.entrypoints=websecure"
+      - "traefik.http.routers.sfu.entrypoints=https"
       - "traefik.http.routers.sfu.tls=true"
       - "traefik.http.services.sfu.loadbalancer.server.port=8080"
     networks:
