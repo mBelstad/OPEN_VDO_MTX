@@ -6,12 +6,12 @@ This shows how to publish from VDO.Ninja (or your fork UI) to your MediaMTX inst
 
 - Open VDO.Ninja and add `&push=<stream-id>&mediamtx=<your-sfu-domain>`
 - Example (your UI):
-  - `https://prekestudio.itagenten.no/?push=demo123&mediamtx=sfu.itagenten.no:8890`
+  - `https://prekestudio.itagenten.no/?push=demo123&mediamtx=sfu.itagenten.no`
   
   Example (vdo.ninja):
   - `https://vdo.ninja/?push=demo123&mediamtx=sfu.itagenten.no`
 - The app constructs the WHIP endpoint as (MediaMTX format):
-  - `https://sfu.itagenten.no:8890/whip/demo123`
+  - `https://sfu.itagenten.no/whip/demo123`
 
 Optional output tuning via URL params:
 
@@ -23,13 +23,13 @@ Optional output tuning via URL params:
 ## Share or play (WHEP)
 
 - WHEP share URL format (MediaMTX format):
-  - `https://sfu.itagenten.no:8890/whep/<stream-id>`
+  - `https://sfu.itagenten.no/whep/<stream-id>`
 - Example:
   - `https://sfu.itagenten.no:8890/demo123/whep`
 
 Use VDO.Ninja as a WHEP player:
 
-- `https://prekestudio.itagenten.no/?whep=https://sfu.itagenten.no:8890/whep/demo123`
+- `https://prekestudio.itagenten.no/?whep=https://sfu.itagenten.no/whep/demo123`
   
   or using vdo.ninja:
   

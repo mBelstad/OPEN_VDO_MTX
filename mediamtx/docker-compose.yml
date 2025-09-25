@@ -4,9 +4,28 @@ services:
   mediamtx:
     image: bluenviron/mediamtx:latest
     container_name: mediamtx
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=coolify"
+      - "traefik.http.routers.mediamtx.rule=Host(`sfu.itagenten.no`)"
+      - "traefik.http.routers.mediamtx.entrypoints=websecure"
+      - "traefik.http.routers.mediamtx.tls=true"
+      - "traefik.http.services.mediamtx.loadbalancer.server.port=8889"
+      - "traefik.http.routers.mediamtx.middlewares=mediamtx-cors"
+      - "traefik.http.middlewares.mediamtx-cors.headers.accesscontrolallowmethods=OPTIONS,POST,GET"
+      - "traefik.http.middlewares.mediamtx-cors.headers.accesscontrolalloworiginlist=https://prekestudio.itagenten.no"
+      - "traefik.http.middlewares.mediamtx-cors.headers.accesscontrolallowheaders=content-type,authorization"
+      - "traefik.http.middlewares.mediamtx-cors.headers.accesscontrolmaxage=86400"
+      - "traefik.http.middlewares.mediamtx-cors.headers.addvaryheader=true"
+    networks:
+      - coolify
     ports:
-      - "8890:8889" # External port 8890 → internal 8889 (avoid conflicts)
       - "8189:8189/udp" # ICE/UDP media. Required for WebRTC to flow.
     restart: unless-stopped
+
+networks:
+  coolify:
+    external: true
+    name: coolify
 
 
