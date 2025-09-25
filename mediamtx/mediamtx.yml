@@ -1,0 +1,16 @@
+logLevel: debug
+
+webrtc:
+  encryption: optional
+  allowOrigin: https://prekestudio.itagenten.no
+  iceServers:
+    - stun:stun.l.google.com:19302
+    - stun:stun.cloudflare.com:3478
+  iceHostNAT1To1IPs:
+    - 65.109.32.111
+  additionalHeaders:
+    Access-Control-Allow-Origin: https://prekestudio.itagenten.no
+    Access-Control-Allow-Methods: "OPTIONS, POST"
+    Access-Control-Allow-Headers: "content-type,authorization"
+
+

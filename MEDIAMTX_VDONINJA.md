@@ -1,14 +1,17 @@
 # VDO.Ninja + MediaMTX quick guide
 
-This shows how to publish from VDO.Ninja to your MediaMTX instance (Coolify) and share a WHEP viewer URL.
+This shows how to publish from VDO.Ninja (or your fork UI) to your MediaMTX instance (Coolify) and share a WHEP viewer URL.
 
 ## Publish to MediaMTX (WHIP)
 
 - Open VDO.Ninja and add `&push=<stream-id>&mediamtx=<your-sfu-domain>`
-- Example:
+- Example (your UI):
+  - `https://prekestudio.itagenten.no/?push=demo123&mediamtx=sfu.itagenten.no:8890`
+  
+  Example (vdo.ninja):
   - `https://vdo.ninja/?push=demo123&mediamtx=sfu.itagenten.no`
 - The app constructs the WHIP endpoint as:
-  - `https://sfu.itagenten.no/demo123/whip`
+  - `https://sfu.itagenten.no:8890/demo123/whip`
 
 Optional output tuning via URL params:
 
@@ -20,13 +23,17 @@ Optional output tuning via URL params:
 ## Share or play (WHEP)
 
 - WHEP share URL format:
-  - `https://sfu.itagenten.no/<stream-id>/whep`
+  - `https://sfu.itagenten.no:8890/<stream-id>/whep`
 - Example:
-  - `https://sfu.itagenten.no/demo123/whep`
+  - `https://sfu.itagenten.no:8890/demo123/whep`
 
 Use VDO.Ninja as a WHEP player:
 
-- `https://vdo.ninja/?whep=https://sfu.itagenten.no/demo123/whep`
+- `https://prekestudio.itagenten.no/?whep=https://sfu.itagenten.no:8890/demo123/whep`
+  
+  or using vdo.ninja:
+  
+  - `https://vdo.ninja/?whep=https://sfu.itagenten.no:8890/demo123/whep`
   - `?whepplay=` also works.
 
 ## Local development
