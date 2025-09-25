@@ -29,6 +29,7 @@ services:
     networks:
       - coolify
     ports:
+      - "8890:8889" # Optional direct access for testing (use DNS-only)
       - "8189:8189/udp" # ICE/UDP media. Required for WebRTC to flow.
     restart: unless-stopped
 
