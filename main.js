@@ -5698,34 +5698,32 @@ async function main() {
 	} 
 	
 	if (session.mediamtx){
-		// Build a proper base URL from the provided mediamtx value without forcing a port,
-		// except when targeting localhost where the default MediaMTX port is 8889.
-		let mediamtxBase = session.mediamtx;
-		if (!(mediamtxBase.startsWith("http://") || mediamtxBase.startsWith("https://"))){
-			if (mediamtxBase.startsWith("localhost") || mediamtxBase.startsWith("127.0.0.1")){
-				// Default to local dev port
-				if (!mediamtxBase.includes(":")){
-					mediamtxBase += ":8889";
+		// Tidy behavior: only use mediamtx if a full WHIP/WHEP URL is provided.
+		// No auto-construction from bare hostnames or domains.
+		let mediamtxUrl = (session.mediamtx || "").trim();
+		if (mediamtxUrl.startsWith("http://") || mediamtxUrl.startsWith("https://")){
+    if (!session.whipOutput && (mediamtxUrl.includes("/whip/") || mediamtxUrl.endsWith("/whip"))){
+        if (mediamtxUrl.endsWith("/whip")) { mediamtxUrl += "/" + session.streamID; }
+        if (!mediamtxUrl.endsWith("/")) { mediamtxUrl += "/"; }
+        session.whipOutput = mediamtxUrl;
+					if (!session.whipoutSettings){
+					let whepUrl = mediamtxUrl.replace("/whip/", "/whep/");
+					if (whepUrl === mediamtxUrl){ whepUrl = mediamtxUrl.replace("/whip", "/whep"); }
+					session.whipoutSettings = { type: "whep", url: whepUrl };
 				}
-				mediamtxBase = "http://" + mediamtxBase;
-			} else {
-				// Assume HTTPS when a domain is provided (Coolify + Traefik + Cloudflare)
-				mediamtxBase = "https://" + mediamtxBase;
-			}
-		}
-
-    // Build endpoints in the format expected by MediaMTX: /whip/<id> and /whep/<id>
-    const mtxBaseTrimmed = mediamtxBase.endsWith("/") ? mediamtxBase.slice(0, -1) : mediamtxBase;
-    if (!session.whipOutput){
-      session.whipOutput = mtxBaseTrimmed + "/whip/" + session.streamID;
-    }
-    if (!session.whipoutSettings){
-      session.whipoutSettings = { type: "whep", url: mtxBaseTrimmed + "/whep/" + session.streamID };
-      console.log("WHIP OUT: "+session.whipOutput+", WHEP SHARE: "+session.whipoutSettings.url);
-    }
-		if (session.stereo === false){ 
-			if (!session.whipOutAudioCodec || (session.whipOutAudioCodec=="opus")){
-				session.stereo=3;
+						console.log("WHIP OUT: "+session.whipOutput+", WHEP SHARE: "+session.whipoutSettings.url);
+    } else if (!session.whipoutSettings && (mediamtxUrl.includes("/whep/") || mediamtxUrl.endsWith("/whep"))){
+        if (mediamtxUrl.endsWith("/whep")) { mediamtxUrl += "/" + session.streamID; }
+        if (!mediamtxUrl.endsWith("/")) { mediamtxUrl += "/"; }
+        session.whipoutSettings = { type: "whep", url: mediamtxUrl };
+				if (!session.whipOutput && session.streamID){
+					let whipUrl = mediamtxUrl.replace("/whep/", "/whip/");
+					if (whipUrl === mediamtxUrl){ whipUrl = mediamtxUrl.replace("/whep", "/whip"); }
+					session.whipOutput = whipUrl;
+				}
+				console.log("WHIP OUT: "+(session.whipOutput||"" )+", WHEP SHARE: "+session.whipoutSettings.url);
+				} else {
+				console.log("mediamtx provided without explicit /whip or /whep path; auto-construction disabled.");
 			}
 		}
 	}
