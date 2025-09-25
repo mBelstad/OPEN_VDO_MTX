@@ -5701,9 +5701,6 @@ async function main() {
 		// Build a proper base URL from the provided mediamtx value without forcing a port,
 		// except when targeting localhost where the default MediaMTX port is 8889.
 		let mediamtxBase = session.mediamtx;
-		if (!mediamtxBase.includes(".") && !mediamtxBase.includes("localhost") && !mediamtxBase.includes("127.0.0.1")){
-			mediamtxBase += ".com";
-		}
 		if (!(mediamtxBase.startsWith("http://") || mediamtxBase.startsWith("https://"))){
 			if (mediamtxBase.startsWith("localhost") || mediamtxBase.startsWith("127.0.0.1")){
 				// Default to local dev port
@@ -5717,21 +5714,15 @@ async function main() {
 			}
 		}
 
-		if (!session.whipOutput){
-			if (mediamtxBase.endsWith("/")){
-				session.whipOutput = mediamtxBase + session.streamID + "/whip";
-			} else {
-				session.whipOutput = mediamtxBase + "/" + session.streamID + "/whip";
-			}
-		}
-		if (!session.whipoutSettings){
-			let whepBase = mediamtxBase;
-			if (whepBase.endsWith("/")) {
-				whepBase = whepBase.slice(0, -1);
-			}
-			session.whipoutSettings = { type: "whep", url: whepBase+"/"+session.streamID+"/whep" };
-			console.log("WHIP OUT: "+session.whipOutput+", WHEP SHARE: "+session.whipoutSettings.url);
-		}
+    // Build endpoints in the format expected by MediaMTX: /whip/<id> and /whep/<id>
+    const mtxBaseTrimmed = mediamtxBase.endsWith("/") ? mediamtxBase.slice(0, -1) : mediamtxBase;
+    if (!session.whipOutput){
+      session.whipOutput = mtxBaseTrimmed + "/whip/" + session.streamID;
+    }
+    if (!session.whipoutSettings){
+      session.whipoutSettings = { type: "whep", url: mtxBaseTrimmed + "/whep/" + session.streamID };
+      console.log("WHIP OUT: "+session.whipOutput+", WHEP SHARE: "+session.whipoutSettings.url);
+    }
 		if (session.stereo === false){ 
 			if (!session.whipOutAudioCodec || (session.whipOutAudioCodec=="opus")){
 				session.stereo=3;
