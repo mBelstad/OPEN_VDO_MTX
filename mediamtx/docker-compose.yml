@@ -4,6 +4,10 @@ services:
   mediamtx:
     image: bluenviron/mediamtx:latest
     container_name: mediamtx
+    environment:
+      MTX_LOGLEVEL: debug
+      MTX_WEBRTC_ICEHOSTNAT1TO1IPS: '["65.109.32.111"]'
+      MTX_WEBRTC_ICESERVERS: '["stun:stun.l.google.com:19302","stun:stun.cloudflare.com:3478"]'
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
@@ -17,6 +21,11 @@ services:
       - "traefik.http.middlewares.mediamtx-cors.headers.accesscontrolallowheaders=content-type,authorization"
       - "traefik.http.middlewares.mediamtx-cors.headers.accesscontrolmaxage=86400"
       - "traefik.http.middlewares.mediamtx-cors.headers.addvaryheader=true"
+      - "traefik.http.routers.mediamtx-preflight.rule=Host(`sfu.itagenten.no`) && (PathPrefix(`/whip/`) || PathPrefix(`/whep/`)) && Method(`OPTIONS`)"
+      - "traefik.http.routers.mediamtx-preflight.entrypoints=websecure"
+      - "traefik.http.routers.mediamtx-preflight.tls=true"
+      - "traefik.http.routers.mediamtx-preflight.service=noop@internal"
+      - "traefik.http.routers.mediamtx-preflight.middlewares=mediamtx-cors"
     networks:
       - coolify
     ports:
